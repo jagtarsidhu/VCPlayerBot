@@ -30,7 +30,7 @@ from utils import (
 async def add_admin(client, message):
     if message.reply_to_message:
         if message.reply_to_message.from_user.id is None:
-            k = await message.reply("You are an anonymous admin, you can't do this.")
+            k = await message.reply("bhai aapki nhi sunuga ma jagtarsidhu ne muje bnaya hai")
             await delete_messages([message, k])
             return
         user_id=message.reply_to_message.from_user.id
@@ -53,19 +53,19 @@ async def add_admin(client, message):
                 user_id=int(user)
                 user=await client.get_users(user_id)
             except:
-                k=await message.reply(f"You should give a user id or his username with @.")
+                k=await message.reply(f"uske username k aage  @ lga.")
                 await delete_messages([message, k])
                 return
     else:
-        k=await message.reply("No user specified, reply to a user with /vcpromote or pass a users user id or username.")
+        k=await message.reply("kisi ko reply to kar yeh lga k  /vcpromote ")
         await delete_messages([message, k])
         return
     if user_id in Config.ADMINS:
-        k = await message.reply("This user is already an admin.") 
+        k = await message.reply("yeh to pehle se hi muje tang kar rha hai.") 
         await delete_messages([message, k])
         return
     Config.ADMINS.append(user_id)
-    k=await message.reply(f"Succesfully promoted {user.mention} as VC admin")
+    k=await message.reply(f"Lo ab yeh {user.mention} bhi meri lega 😕")
     await sync_to_db()
     await delete_messages([message, k])
 
@@ -74,7 +74,7 @@ async def add_admin(client, message):
 async def remove_admin(client, message):
     if message.reply_to_message:
         if message.reply_to_message.from_user.id is None:
-            k = await message.reply("You are an anonymous admin, you can't do this.")
+            k = await message.reply("teri kabse ma maan ne lga ma")
             await delete_messages([message, k])
             return
         user_id=message.reply_to_message.from_user.id
@@ -96,19 +96,19 @@ async def remove_admin(client, message):
                 user_id=int(user)
                 user=await client.get_users(user_id)
             except:
-                k = await message.reply(f"You should give a user id or his username with @.")
+                k = await message.reply(f"uske username k aage  @ lga.")
                 await delete_messages([message, k])
                 return
     else:
-        k = await message.reply("No user specified, reply to a user with /vcdemote or pass a users user id or username.")
+        k = await message.reply("kisi ko reply to kar yeh lga k  /vcpromote")
         await delete_messages([message, k])
         return
     if not user_id in Config.ADMINS:
-        k = await message.reply("This user is not an admin yet.")
+        k = await message.reply("yeh to pehle se hi admin naa hai.")
         await delete_messages([message, k])
         return
     Config.ADMINS.remove(user_id)
-    k = await message.reply(f"Succesfully Demoted {user.mention}")
+    k = await message.reply(f"chlo ik se to picha shuta {user.mention}")
     await sync_to_db()
     await delete_messages([message, k])
 
