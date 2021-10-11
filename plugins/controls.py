@@ -162,7 +162,7 @@ async def set_vol(_, m: Message):
         await delete_messages([m])
         return
     if len(m.command) < 2:
-        await m.reply_text('Change Volume of Your VCPlayer. ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ', reply_markup=await volume_buttons())
+        await m.reply_text('Change Volume of jaggu player. ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ', reply_markup=await volume_buttons())
         await delete_messages([m])
         return
     if not 1 < int(m.command[1]) < 200:
@@ -326,5 +326,5 @@ async def seek_playout(client, m: Message):
 
 @Client.on_message(filters.command(["settings", f"settings@{Config.BOT_USERNAME}"]) & admin_filter & chat_filter)
 async def settings(client, m: Message):
-    await m.reply(f"Configure Your VCPlayer Settings Here. ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ", reply_markup=await settings_panel(), disable_web_page_preview=True)
+    await m.reply(f"Configure jaggu Player Settings Here. ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ", reply_markup=await settings_panel(), disable_web_page_preview=True)
     await delete_messages([m])
