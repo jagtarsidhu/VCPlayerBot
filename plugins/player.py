@@ -70,7 +70,7 @@ async def add_to_playlist(_, message: Message):
         admins = await get_admins(Config.CHAT)
         if Config.ADMIN_ONLY:
             if not (message.from_user is None and message.sender_chat or message.from_user.id in admins):
-                k=await message.reply_sticker("CAADBQADsQIAAtILIVYld1n74e3JuQI")
+                k=await message.reply("@jagtarsidhu ko bolo ki muje admin bnao fir kus baat ban sakti hai")
                 await delete_messages([message, k])
                 return
         type=""
@@ -78,7 +78,7 @@ async def add_to_playlist(_, message: Message):
         ysearch=""
         if message.command[0] == "fplay":
             if not (message.from_user is None and message.sender_chat or message.from_user.id in admins):
-                k=await message.reply("This command is only for admins.")
+                k=await message.reply("keval admins k lie hai")
                 await delete_messages([message, k])
                 return
         msg = await message.reply_text("⚡️ **Checking recived input..**")
@@ -254,25 +254,11 @@ async def leave_voice_chat(_, m: Message):
         await delete_messages([m, k])
         return
     await leave_call()
-    k=await m.reply("Succesfully left videochat.")
+    k=await m.reply("lo ma jaa rha.")
     await delete_messages([m, k])
 
 
 
-@Client.on_message(filters.command(["shuffle", f"shuffle@{Config.BOT_USERNAME}"]) & admin_filter & chat_filter)
-async def shuffle_play_list(client, m: Message):
-    if not Config.CALL_STATUS:
-        k = await m.reply("Not joined any voicechat.")
-        await delete_messages([m, k])
-        return
-    else:
-        if len(Config.playlist) > 2:
-            k=await m.reply_text(f"Playlist Shuffled.")
-            await shuffle_playlist()
-            await delete_messages([m, k])            
-        else:
-            k=await m.reply_text(f"You cant shuffle playlist with less than 3 songs.")
-            await delete_messages([m, k])
 
 
 @Client.on_message(filters.command(["clearplaylist", f"clearplaylist@{Config.BOT_USERNAME}"]) & admin_filter & chat_filter)
@@ -290,68 +276,6 @@ async def clear_play_list(client, m: Message):
     else:
         await leave_call()
     await delete_messages([m, k])
-
-
-
-@Client.on_message(filters.command(["cplay", f"cplay@{Config.BOT_USERNAME}"]) & admin_filter & chat_filter)
-async def channel_play_list(client, m: Message):
-    with suppress(MessageIdInvalid, MessageNotModified):
-        k=await m.reply("Setting up for channel play..")
-        if " " in m.text:
-            you, me = m.text.split(" ", 1)
-            if me.startswith("-100"):
-                try:
-                    me=int(me)
-                except:
-                    await k.edit("Invalid chat id given")
-                    await delete_messages([m, k])
-                    return
-                try:
-                    await client.get_chat_member(int(me), Config.USER_ID)
-                except (ValueError, PeerIdInvalid, ChannelInvalid):
-                    LOGGER.error(f"Given channel is private and @{Config.BOT_USERNAME} is not an admin over there.", exc_info=True)
-                    await k.edit(f"Given channel is private and @{Config.BOT_USERNAME} is not an admin over there. If channel is not private , please provide username of channel.")
-                    await delete_messages([m, k])
-                    return
-                except UserNotParticipant:
-                    LOGGER.error("Given channel is private and USER account is not a member of channel.")
-                    await k.edit("Given channel is private and USER account is not a member of channel.")
-                    await delete_messages([m, k])
-                    return
-                except Exception as e:
-                    LOGGER.error(f"Errors occured while getting data abount channel - {e}", exc_info=True)
-                    await k.edit(f"Something went wrong- {e}")
-                    await delete_messages([m, k])
-                    return
-                await k.edit("Searching files from channel, this may take some time, depending on number of files in the channel.")
-                st, msg = await c_play(me)
-                if st == False:
-                    await m.edit(msg)
-                else:
-                    await k.edit(f"Succesfully added {msg} files to playlist.")
-            elif me.startswith("@"):
-                me = me.replace("@", "")
-                try:
-                    chat=await client.get_chat(me)
-                except Exception as e:
-                    LOGGER.error(f"Errors occured while fetching info about channel - {e}", exc_info=True)
-                    await k.edit(f"Errors occured while getting data about channel - {e}")
-                    await delete_messages([m, k])
-                    return
-                await k.edit("Searching files from channel, this may take some time, depending on number of files in the channel.")
-                st, msg=await c_play(me)
-                if st == False:
-                    await k.edit(msg)
-                    await delete_messages([m, k])
-                else:
-                    await k.edit(f"Succesfully Added {msg} files from {chat.title} to playlist")
-                    await delete_messages([m, k])
-            else:
-                await k.edit("The given channel is invalid. For private channels it should start with -100 and for public channels it should start with @\nExamples - `/cplay @VCPlayerFiles or /cplay -100125369865\n\nFor private channel, both bot and the USER account should be members of channel.")
-                await delete_messages([m, k])
-        else:
-            await k.edit("You didn't gave me any channel. Give me a channel id or username from which i should play files . \nFor private channels it should start with -100 and for public channels it should start with @\nExamples - `/cplay @VCPlayerFiles or /cplay -100125369865\n\nFor private channel, both bot and the USER account should be members of channel.")
-            await delete_messages([m, k])
 
 
 
@@ -388,55 +312,7 @@ async def yt_play_list(client, m: Message):
             await delete_messages([m, k])
 
 
-@Client.on_message(filters.command(["stream", f"stream@{Config.BOT_USERNAME}"]) & admin_filter & chat_filter)
-async def stream(client, m: Message):
-    with suppress(MessageIdInvalid, MessageNotModified):
-        msg=await m.reply("Checking the recived input.")
-        if m.reply_to_message and m.reply_to_message.text:
-            link=m.reply_to_message.text
-        elif " " in m.text:
-            text = m.text.split(" ", 1)
-            link = text[1]
-        else:
-            k = await msg.edit("Provide a link to stream!")
-            await delete_messages([m, k])
-            return
-        regex = r"^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?"
-        match = re.match(regex,link)
-        if match:
-            stream_link=await get_link(link)
-            if not stream_link:
-                k = await msg.edit("This is an invalid link.")
-                await delete_messages([m, k])
-                return
-        else:
-            stream_link=link
-        try:
-            is_audio_ = await is_audio(stream_link)
-        except:
-            is_audio_ = False
-            LOGGER.error("Unable to get Audio properties within time.")
-        if not is_audio_:
-            k = await msg.edit("This is an invalid link, provide me a direct link or a youtube link.")
-            await delete_messages([m, k])
-            return
-        try:
-            dur=await get_duration(stream_link)
-        except:
-            dur=0
-        if dur != 0:
-            k = await msg.edit("This is not a live stream, Use /play command.")
-            await delete_messages([m, k])
-            return
-        k, msg_=await stream_from_link(stream_link)
-        if k == False:
-            k = await msg.edit(msg_)
-            await delete_messages([m, k])
-            return
-        if Config.msg.get('player'):
-            await Config.msg['player'].delete()
-        Config.msg['player']=await msg.edit(f"[Streaming]({stream_link}) Started. ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ", disable_web_page_preview=True, reply_markup=await get_buttons())
-        await delete_messages([m])
+
         
 
 
@@ -451,7 +327,7 @@ allcmd = ["play", "player", f"play@{Config.BOT_USERNAME}", f"player@{Config.BOT_
 
 @Client.on_message(filters.command(admincmds) & ~admin_filter & chat_filter)
 async def notforu(_, m: Message):
-    k = await _.send_cached_media(chat_id=m.chat.id, file_id="CAADBQADEgQAAtMJyFVJOe6-VqYVzAI", caption="You Are Not Authorized", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('⚡️Join Here', url='https://t.me/subin_works')]]))
+    k = await _.send_cached_media(chat_id=m.chat.id, file_id="CAADBQADEgQAAtMJyFVJOe6-VqYVzAI", caption="apko aagya ni hai", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton('⚡️Join Here', url='https://t.me/subin_works')]]))
     await delete_messages([m, k])
 
 @Client.on_message(filters.command(allcmd) & ~chat_filter & filters.group)
@@ -465,14 +341,13 @@ async def not_chat(_, m: Message):
                 InlineKeyboardButton('No', callback_data='closesudo'),
             ]
             ]
-        await m.reply("This is not the group which i have been configured to play, Do you want to set this group as default CHAT?", reply_markup=InlineKeyboardMarkup(buttons))
+        await m.reply("keval exchangers adda group k lie bna hu ma contact @jagtarsidhu", reply_markup=InlineKeyboardMarkup(buttons))
         await delete_messages([m])
     else:
         buttons = [
             [
-                InlineKeyboardButton('⚡️Make Own Bot', url='https://github.com/subinps/VCPlayerBot'),
-                InlineKeyboardButton('🧩 Join Here', url='https://t.me/subin_works'),
+                InlineKeyboardButton('🧩 Contact here', url='https://t.me/jagtarsidhu'),
             ]
             ]
-        await m.reply("<b>You can't use this bot in this group, for that you have to make your own bot from the [SOURCE CODE](https://github.com/subinps/VCPlayerBot) below.</b>", disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup(buttons))
+        await m.reply("<b>keval exchangers adda group k lie bna hu ma contact @jagtarsidhu</b>", disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup(buttons))
 
