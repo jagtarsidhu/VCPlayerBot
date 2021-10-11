@@ -83,8 +83,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 return
             if you == "video":
                 text="Toggle your bot to Video / Audio Player."
-            elif you == "shuffle":
-                text="Enable or disable auto playlist shuffling"
             elif you == "admin":
                 text="Enable to restrict the play command only for admins."
             elif you == "mode":
@@ -93,21 +91,13 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 text="Enable to edit the VideoChat title to Current playing song's title."
             elif you == "reply":
                 text="Choose whether to auto-reply messaged for userbot. "
-            elif you == "videorecord":
-                text = "Enable to record both video and audio, if disabled only audio will be recorded."
-            elif you == "videodimension":
-                text = "Choose the recording video's dimensions"
-            elif you == "rectitle":
-                text = "A custom title for your chat recordings, Use /rtitle command to set a title"
-            elif you == "recdumb":
-                text = "A channel to which all the recordings are forwarded. Make sure The User account is admin over there. Set one using /env or /config."
             await query.answer(text=text, show_alert=True)
             return
 
 
         elif query.data.startswith("help"):
             if query.message.chat.type != "private" and query.message.reply_to_message.from_user is None:
-                return await query.answer("I cant help you here, since you are an anonymous admin, message me in private chat.", show_alert=True)
+                return await query.answer("apki ma koi madad nhi kar sakta aap admin ni hai contact @jagtarsidhu", show_alert=True)
             elif query.message.chat.type != "private" and query.from_user.id != query.message.reply_to_message.from_user.id:
                 return await query.answer("Okda", show_alert=True)
             me, nyav = query.data.split("_")
@@ -125,16 +115,13 @@ async def cb_handler(client: Client, query: CallbackQuery):
                         [
                             InlineKeyboardButton(f"Play", callback_data='help_play'),
                             InlineKeyboardButton(f"Settings", callback_data=f"help_settings"),
-                            InlineKeyboardButton(f"Recording", callback_data='help_record'),
                         ],
                         [
-                            InlineKeyboardButton("Scheduling", callback_data="help_schedule"),
                             InlineKeyboardButton("Controling", callback_data='help_control'),
                             InlineKeyboardButton("Admins", callback_data="help_admin"),
                         ],
                         [
                             InlineKeyboardButton(f"Misc", callback_data='help_misc'),
-                            InlineKeyboardButton("Config Vars", callback_data='help_env'),
                             InlineKeyboardButton("Close", callback_data="close"),
                         ],
                     ]
@@ -144,16 +131,12 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 await query.message.edit(Config.PLAY_HELP, reply_markup=back, disable_web_page_preview=True)
             elif nyav == 'settings':
                 await query.message.edit(Config.SETTINGS_HELP, reply_markup=back, disable_web_page_preview=True)
-            elif nyav == 'schedule':
-                await query.message.edit(Config.SCHEDULER_HELP, reply_markup=back, disable_web_page_preview=True)
             elif nyav == 'control':
                 await query.message.edit(Config.CONTROL_HELP, reply_markup=back, disable_web_page_preview=True)
             elif nyav == 'admin':
                 await query.message.edit(Config.ADMIN_HELP, reply_markup=back, disable_web_page_preview=True)
             elif nyav == 'misc':
                 await query.message.edit(Config.MISC_HELP, reply_markup=back, disable_web_page_preview=True)
-            elif nyav == 'record':
-                await query.message.edit(Config.RECORDER_HELP, reply_markup=back, disable_web_page_preview=True)
             elif nyav == 'env':
                 await query.message.edit(Config.ENV_HELP, reply_markup=back, disable_web_page_preview=True)
             return
@@ -167,7 +150,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         #scheduler stuffs
         if query.data.startswith("sch"):
             if query.message.chat.type != "private" and query.message.reply_to_message.from_user is None:
-                return await query.answer("You cant use scheduling here, since you are an anonymous admin. Schedule from private chat.", show_alert=True)
+                return await query.answer("admin ni ho.", show_alert=True)
             if query.message.chat.type != "private" and query.from_user.id != query.message.reply_to_message.from_user.id:
                 return await query.answer("Okda", show_alert=True)
             data = query.data
@@ -394,6 +377,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
         elif query.data=="replay":
             if not Config.playlist:
                 await query.answer("No songs in playlist", show_alert=True)
+                await query.answer("Muted stream")
+            await sleep(1)
             else:
                 await query.answer("trying to restart player")
                 await restart_playout()
@@ -407,8 +392,6 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 await query.answer("Unmuted stream")
             else:
                 await mute()
-                await query.answer("Muted stream")
-            await sleep(1)
             await query.message.edit_reply_markup(reply_markup=await volume_buttons())
 
         elif query.data.lower() == 'seek':
